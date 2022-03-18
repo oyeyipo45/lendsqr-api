@@ -1,0 +1,16 @@
+const express = require("express");
+const app = express();
+const router = express.Router();
+
+const usersRouter = require("./api/users");
+
+// Parse URL-encoded bodies (as sent by HTML forms)
+app.use(express.urlencoded({ extended: true }));
+// Parse JSON bodies (as sent by API clients)
+app.use(express.json());
+
+router.use("/users", usersRouter);
+
+app.use("/api", router);
+
+module.exports = app;
