@@ -1,10 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const knex = require("../database");
-const { v4: uuidv4 } = require('uuid');
+const bcrypt = require('bcrypt');
+const jwtGen = require('../../../utils/jwtgen');
+const validate = require("../../../utils/validate");
 
 
-router.get("/users", async (req, res) => {
+router.get("/users", async (req, res, next) => {
   try {
     
     const users = await knex("users");
@@ -17,57 +19,51 @@ router.get("/users", async (req, res) => {
 });
 
 
-router.post('/create-user', async (req, res) => {
+router.post('/register', validate, async (req, res, next) => {
   try {
-    
-    const {
-      username,
-      frst_name,
-      last_name,
-      email,
-      password,
-    } = req.body
-    
+    const { username, first_name, last_name, email, password } = req.body;
 
     const user_data = {
       username,
-      frst_name,
+      first_name,
       last_name,
       email,
-      password
     };
 
-  
-    
+    const availableUser = await knex('users').select().where({ email: email }).orWhere({username : username});
 
-    const user = await knex('users').insert({ ...user_data });
+    if (availableUser.length > 0) {
+      return res.json({ status_code: 400, success: false, message: 'A user with this email or username already exist' });
+    }
 
-  
+    // Hashing user's password
+    const saltRound = 10;
+    const salt = await bcrypt.genSalt(saltRound);
+    const bcryptPassword = await bcrypt.hash(password, salt);
+
+    // Create user
+    const user = await knex('users').insert({ ...user_data, password: bcryptPassword });
 
     const foundUser = await knex('users').select().where({ username: username });
 
-      console.log(foundUser, 'foundUser');
-    
     if (foundUser) {
       const data = {
-        wallet_id : foundUser[0].username,
+        wallet_id: foundUser[0].username,
         balance: 0,
         currency: 'NGN',
       };
 
-      
-      const wallet = await knex('wallet').insert({...data});
+      const wallet = await knex('wallet').insert({ ...data });
 
-      res.json({ data: wallet, status_code: 200, success: true });
+      //Generating a JWT token
+      const token = jwtGen(foundUser[0].username);
+
+      return res.json({ data:{ token : token}, status_code: 200, success: true, message: 'User created succesfully' });
     }
-    
-
-   
   } catch (error) {
-    throw error;
+    next(error);
   }
 });
-
 
 router.post('/fund-wallet', async (req, res) => {
   try {
@@ -157,11 +153,21 @@ router.post('/login', async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await knex('users').select('password').where({ 'email': email });
+    const user = await knex('users').select('first_name', 'last_name', 'username', 'email', 'password').where({ email: email });
 
-    res.json({ data: user, status_code: 200, success: true });
+    console.log(user, 'user');
+    if (user.length === 0) {
+      return res.status(401).json({ success: false, status_code: 400, message: 'Invalid Credential(s)' });
+    }
+    const validPassword = await bcrypt.compare(password, user[0].password);
+    if (!validPassword) {
+      return res.status(401).json({ message: 'Incorrect Password' });
+    }
+    const token = jwtGen(user[0].id);
+
+   return res.json({ data: { ...user[0] , token }, status_code: 200, success: true });
   } catch (error) {
-    throw error;
+    next(error);
   }
 });
 

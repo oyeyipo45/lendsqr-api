@@ -15,17 +15,6 @@ module.exports = {
     migrations: {
       directory: path.join(__dirname, './migrations'),
     },
-  },
-  test: {
-    client: 'sqlite3',
-    connection: ':memory:',
-    seeds: {
-      directory: path.join(__dirname, './test/seeds'),
-    },
-    migrations: {
-      directory: path.join(__dirname, './test/migrations'),
-    },
-    useNullAsDefault: true,
-  },
+  }
 };
 
