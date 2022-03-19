@@ -21,14 +21,15 @@ app.use((req, res, next) => {
   next(err);
 });
 
-if (app.get('env') === 'development') {
+if (app.get('env') === 'development' || 'production') {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.send({
-      message: err.sqlMessage,
+      message: "An error occured",
       error: err.status,
     });
   });
 }
+
 
 module.exports = app;
