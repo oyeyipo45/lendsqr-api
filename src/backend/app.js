@@ -25,7 +25,7 @@ if (app.get('env') === 'development' || 'production') {
   app.use((err, req, res, next) => {
     res.status(err.status || 500);
     res.send({
-      message: "An error occured",
+      message: err.message,
       error: err.status,
     });
   });
