@@ -84,9 +84,9 @@ router.get('/user', auth, async (req, res, next) => {
     const wallet = await knex('wallet').select().where({ wallet_id: req.username });
     const transactions = await knex('transactions').select().where({ wallet_id: req.username });
 
-    const token = jwtGen(5000);
+    // const token = jwtGen(5000);
 
-    console.log(token)
+    // console.log(token)
 
     return res.json({ data: { user, wallet, transactions }, status_code: 200, success: true });
   } catch (error) {
@@ -115,6 +115,16 @@ router.put('/fund-wallet', auth,  async (req, res, next) => {
 
         const updated_wallet = await knex('wallet').where({ wallet_id: username }).update({ balance: credit });
 
+        const transaction_data = {
+          wallet_id: username,
+          sender_id: username,
+          transaction_type: 'Lodgment',
+          credit_amount: verifiedAmount,
+          currency: 'NGN',
+        };
+
+        const transaction = await knex('transactions').insert({ ...transaction_data });
+
         const new_balance = await knex('wallet').select().where({ wallet_id: username });
 
        return  res.json({ data: { ...new_balance[0] }, status_code: 200, success: true, message: 'Wallet funded sucessfully' });
@@ -125,6 +135,7 @@ router.put('/fund-wallet', auth,  async (req, res, next) => {
     next(error);
   }
 });
+
 
 router.put('/withdraw', auth, async (req, res, next) => {
   try {
@@ -151,7 +162,17 @@ router.put('/withdraw', auth, async (req, res, next) => {
 
       const updated_wallet = await knex('wallet').where({ wallet_id: username }).update({ balance: debit });
 
+       const transaction_data = {
+         wallet_id: username,
+         sender_id: username,
+         transaction_type: 'Withdrawal',
+         debit_amount: verifiedAmount,
+         currency: 'NGN',
+       };
+
       const new_balance = await knex('wallet').select().where({ wallet_id: username });
+
+      const sender_transaction = await knex('transactions').insert({ ...transaction_data });
 
       return res.json({ data: { ...new_balance[0] }, status_code: 200, success: true, message: 'Withdrawal sucessfully' });
     }
@@ -169,6 +190,8 @@ router.post('/transfer', auth, async (req, res, next) => {
     const sender_username = req.username
 
      const payload = jwt.verify(amount, process.env.SECRET);
+
+    console.log(payload, 'payload');
 
      const verifiedAmount = payload.user;
 
@@ -206,6 +229,27 @@ router.post('/transfer', auth, async (req, res, next) => {
       const debited_balance = await knex('wallet').select().where({ wallet_id: sender_username });
 
       const credited_balance = await knex('wallet').select().where({ wallet_id: receiver_username });
+
+      const sender_transaction_data = {
+        wallet_id: sender_username,
+        sender_id: sender_username,
+        receiver_id: receiver_username,
+        transaction_type: 'Withdrawal',
+        debit_amount: verifiedAmount,
+        currency: "NGN"
+      };
+
+       const receiver_transaction_data = {
+         sender_id: sender_username,
+         receiver_id: receiver_username,
+         transaction_type: 'Lodgement',
+         credit_amount: verifiedAmount,
+         currency: 'NGN',
+       };
+
+      const sender_transaction = await knex('transactions').insert({ ...sender_transaction_data });
+      
+      const receiver_transaction = await knex('transactions').insert({ ...receiver_transaction_data });
 
      return  res.json({ data: debited_balance[0], status_code: 200, success: true });
     }
