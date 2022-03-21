@@ -142,6 +142,8 @@ router.put('/withdraw', auth, async (req, res, next) => {
     const { amount } = req.body;
     const username = req.username;
 
+    console.log(amount, "amount")
+
     const payload = jwt.verify(amount, process.env.SECRET);
 
     const verifiedAmount = payload.user;
