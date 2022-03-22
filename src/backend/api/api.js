@@ -8,6 +8,9 @@ const auth = require('../middlewares/auth');
 const jwt = require('jsonwebtoken');
 
 
+router.get('/', async (req, res, next) => {
+    return res.status(200).json({ message: 'Api ready', status_code: 200, success: true });
+})
 
 router.post('/register', validate, async (req, res, next) => {
   try {
