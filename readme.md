@@ -40,7 +40,7 @@ CREATE TABLE `lendsqrApp`.`transactions` (
  `receiver_id` VARCHAR(255) NULL,
  `transaction_type` VARCHAR(255) NULL,
  `debit_amount` INT(45) NULL,
- `credit_amont` INT(45) NULL,
+ `credit_amount` INT(45) NULL,
   `created_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `currency` VARCHAR(255) NULL);
 
