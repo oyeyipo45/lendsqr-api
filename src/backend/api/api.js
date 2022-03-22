@@ -95,10 +95,6 @@ router.get('/user', auth, async (req, res, next) => {
     const wallet = await knex('wallet').select().where({ wallet_id: req.username });
     const transactions = await knex('transactions').select().where({ wallet_id: req.username }).orderBy('created_date', 'desc');
 
-    // const token = jwtGen(5000);
-
-    // console.log(token)
-
     return res.status(200).json({ data: { user, wallet, transactions }, status_code: 200, success: true });
   } catch (error) {
     next(error);
@@ -156,8 +152,6 @@ router.put('/withdraw', auth, async (req, res, next) => {
     const { amount } = req.body;
     const username = req.username;
 
-    console.log(amount, "amount")
-
     const payload = jwt.verify(amount, process.env.SECRET);
 
     const verifiedAmount = payload.user;
@@ -210,8 +204,6 @@ router.post('/transfer', auth, async (req, res, next) => {
     const sender_username = req.username
 
     const load = jwt.verify(payload, process.env.SECRET);
-    
-    console.log(load, "load")
 
     const verifiedAmount = load.user.tansfer_amount;
     const receiver_username = load.user.receiver_username

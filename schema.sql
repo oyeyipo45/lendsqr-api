@@ -1,5 +1,6 @@
+
 CREATE TABLE `users` (
-  `id`  BINARY(16) PRIMARY KEY,
+  `id`  INT NOT NULL AUTO_INCREMENT,
   `username` VARCHAR(255) NULL UNIQUE,
   `first_name` VARCHAR(255) NULL,
   `last_name` VARCHAR(255) NULL,
@@ -9,7 +10,7 @@ CREATE TABLE `users` (
   
   
 CREATE TABLE `wallet` (
-  `id` BINARY(16) PRIMARY KEY,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `wallet_id` VARCHAR(255) NULL UNIQUE,
   `created_date` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `balance` INT(45) NULL,
@@ -18,7 +19,7 @@ CREATE TABLE `wallet` (
 
 
 CREATE TABLE `transactions` (
-  `id` BINARY(16) PRIMARY KEY,
+  `id` INT NOT NULL AUTO_INCREMENT,
   `wallet_id` VARCHAR(255) NULL,
  `sender_id` VARCHAR(255) NULL,
  `receiver_id` VARCHAR(255) NULL,
