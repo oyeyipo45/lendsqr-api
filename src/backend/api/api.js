@@ -162,10 +162,6 @@ router.put('/withdraw', auth, async (req, res, next) => {
 
     const verifiedAmount = payload.user;
 
-    if (verifiedAmount >= 1000000) {
-      return res.status(400).json({ data: {}, status_code: 400, success: false, message: 'Max withdrawal is 1,000,000 per day' });
-    } 
-
     const wallet = await knex('wallet').select().where({ wallet_id: username });
 
     if (wallet.length === 0) {
@@ -177,6 +173,10 @@ router.put('/withdraw', auth, async (req, res, next) => {
       if (wallet_balance_validation.length > 0) {
        return res.status(400).json({ data: {}, status_code: 400, success: false, message: 'Insuffucient funds' });
       }
+
+      if (verifiedAmount > 1000000) {
+        return res.status(400).json({ data: {}, status_code: 400, success: false, message: 'Max withdrawal is 1,000,000 per day' });
+      } 
 
       const debit = wallet[0].balance - verifiedAmount;
 
@@ -216,10 +216,6 @@ router.post('/transfer', auth, async (req, res, next) => {
     const verifiedAmount = load.user.tansfer_amount;
     const receiver_username = load.user.receiver_username
 
-    if (verifiedAmount >= 1000000) {
-      return res.status(400).json({ data: {}, status_code: 400, success: false, message: 'Max transfer amount is 1,000,000 per day' });
-    } 
-
     // check receiver wallet exists
     const receiver_wallet = await knex('wallet').where({ wallet_id: receiver_username });
 
@@ -237,6 +233,11 @@ router.post('/transfer', auth, async (req, res, next) => {
     if (sender_wallet_balance_validation.length === 0) {
       return res.status(400).json({ data: {}, status_code: 400, success: false, message: 'Insuffucient funds' });
     } else {
+
+       if (verifiedAmount > 1000000) {
+         return res.status(400).json({ data: {}, status_code: 400, success: false, message: 'Max transfer amount is 1,000,000 per day' });
+      } 
+      
       const sender_old_balance = await knex('wallet').select().where({ wallet_id: sender_username });
 
       // Get wallet balance
