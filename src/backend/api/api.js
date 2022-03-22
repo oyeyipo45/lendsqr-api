@@ -17,10 +17,10 @@ router.post('/register', validate, async (req, res, next) => {
     const { username, first_name, last_name, email, password } = req.body;
 
     const user_data = {
-      username : username.tolowerCase(),
+      username : username.toLowerCase(),
       first_name,
       last_name,
-      email : email.tolowerCase(),
+      email : email.toLowerCase(),
     };
 
     const availableUser = await knex('users').select().where({ email: email }).orWhere({username : username});
@@ -63,7 +63,7 @@ router.post('/login', validate, async (req, res, next) => {
   try {
     const { email , password } = req.body;
 
-    const user = await knex('users').select('first_name', 'last_name', 'username', 'email', 'password').where({ email: email.tolowerCase() });
+    const user = await knex('users').select('first_name', 'last_name', 'username', 'email', 'password').where({ email: email.toLowerCase() }); 
 
     if (user.length === 0) {
       return res.status(401).json({ success: false, status_code: 400, message: 'Invalid Credential(s)' });
@@ -104,7 +104,7 @@ router.put('/fund-wallet', auth,  async (req, res, next) => {
   try {
     
     const { amount } = req.body;
-    const username = req.username.tolowerCase();
+    const username = req.username.toLowerCase();
 
     const payload = jwt.verify(amount, process.env.SECRET);
 
@@ -148,7 +148,7 @@ router.put('/fund-wallet', auth,  async (req, res, next) => {
 router.put('/withdraw', auth, async (req, res, next) => {
   try {
     const { amount } = req.body;
-    const username = req.username.tolowerCase()
+    const username = req.username.toLowerCase()
 
     const payload = jwt.verify(amount, process.env.SECRET);
 
@@ -199,12 +199,12 @@ router.post('/transfer', auth, async (req, res, next) => {
   try {
     // Destructure request body
     const { payload } = req.body;
-    const sender_username = req.username.tolowerCase();
+    const sender_username = req.username.toLowerCase();
 
     const load = jwt.verify(payload, process.env.SECRET);
 
     const verifiedAmount = load.user.tansfer_amount;
-    const receiver_username = load.user.receiver_username.tolowerCase();
+    const receiver_username = load.user.receiver_username.toLowerCase();
 
     // check receiver wallet exists
     const receiver_wallet = await knex('wallet').where({ wallet_id: receiver_username });
