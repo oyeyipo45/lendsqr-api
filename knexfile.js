@@ -18,9 +18,9 @@ module.exports = {
     connection: {
       connection: {
         host: '127.0.01',
-        port: 'root',
-        user: '3306',
-        password: '1234567',
+        port: '3306',
+        user: 'root',
+        password: 'Kolade11',
         database: 'testDb',
       },
     },

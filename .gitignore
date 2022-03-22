@@ -41,9 +41,6 @@ build
 
 dist/
 
-test/
-
-test*
 
 .DS_Store
 
