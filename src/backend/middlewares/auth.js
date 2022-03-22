@@ -14,6 +14,6 @@ module.exports = async (req, res, next) => {
     req.username = payload.user;
     next();
   } catch (err) {
-    res.status(401).json({ message: 'Token is not valid please reauthenticate user' , status_code : 401, success :false});
+    res.status(401).json({ message: 'Token is not valid please log out and login again' , status_code : 401, success :false});
   }
 };
