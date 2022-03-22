@@ -13,6 +13,10 @@ app.use(cors());
 
 router.use("/api/v1/", usersRouter);
 
+app.get('/', (req, res) => {
+  res.send(`LENDSQR API 1.0, ${process.env.NODE_ENV} server`);
+});
+
 app.use("/", router);
 
 app.use((req, res, next) => {
