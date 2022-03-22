@@ -63,7 +63,9 @@ router.post('/login', validate, async (req, res, next) => {
   try {
     const { email, password } = req.body;
 
-    const user = await knex('users').select('first_name', 'last_name', 'username', 'email', 'password').where({ email: email });
+    const user = await knex('users')
+      .select('first_name', 'last_name', 'username', 'email', 'password')
+      .where({ email: email })
 
     if (user.length === 0) {
       return res.status(401).json({ success: false, status_code: 400, message: 'Invalid Credential(s)' });
@@ -74,7 +76,13 @@ router.post('/login', validate, async (req, res, next) => {
     }
     const token = jwtGen(user[0].username);
 
-    return res.status(200).json({ data: { ...user[0], token }, status_code: 200, success: true });
+    let first_name = user[0].first_name
+    let last_name = user[0].last_name
+    let userEmail = user[0].email
+    let username = user[0].username
+    
+
+    return res.status(200).json({ data: { first_name, last_name, username, userEmail, token }, status_code: 200, success: true });
   } catch (error) {
     next(error);
   }

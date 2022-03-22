@@ -11,12 +11,9 @@ const connectDB = async () => {
     db = knex(config.development);
     // Check that the connection works
     const connected = await db.raw('SELECT VERSION()')
-
-      
     if (connected) {
       console.log(`connection to knex was successful!`);
     }
-    
   }
 }
 

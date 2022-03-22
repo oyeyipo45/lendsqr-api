@@ -12,9 +12,24 @@ module.exports = {
       database: process.env.DB_NAME,
     },
     pool: { min: 0, max: 7 },
-    migrations: {
-      directory: path.join(__dirname, './migrations'),
+  },
+  test: {
+    client: 'mysql2',
+    connection: {
+      connection: {
+        host: '127.0.01',
+        port: 'root',
+        user: '3306',
+        password: '1234567',
+        database: 'testDb',
+      },
     },
-  }
+    seeds: {
+      directory: path.join(__dirname, './test/seeds'),
+    },
+    migrations: {
+      directory: path.join(__dirname, './test/migrations'),
+    },
+    useNullAsDefault: true,
+  },
 };
-
